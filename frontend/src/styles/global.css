@@ -108,15 +108,52 @@ html, body {
   border-radius: 4px;
 }
 
-/* ─── Utility Classes ─────────────────────────────────────────────────── */
+/* ─── Fluid Responsive Container Architecture ─────────────────────────── */
 .container-max {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 24px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;   /* 16px on mobile */
+  padding-right: 1rem;
 }
 
-@media (max-width: 768px) {
-  .container-max { padding: 0 16px; }
+@media (min-width: 640px) {
+  .container-max {
+    padding-left: 1.5rem; /* 24px on tablet */
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-max {
+    padding-left: 2rem; /* 32px on laptop */
+    padding-right: 2rem;
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1366px) {
+  .container-max {
+    padding-left: 2.5rem; /* 40px on medium desktop */
+    padding-right: 2.5rem;
+    max-width: 1480px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .container-max {
+    padding-left: 3rem; /* 48px on large desktop / 1080p full screen */
+    padding-right: 3rem;
+    max-width: 1680px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .container-max {
+    padding-left: 3.5rem; /* 56px on 2K / 4K widescreen */
+    padding-right: 3.5rem;
+    max-width: 1800px;
+  }
 }
 
 /* Skeleton shimmer animation */

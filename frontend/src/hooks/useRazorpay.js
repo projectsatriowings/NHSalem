@@ -20,7 +20,7 @@ export default function useRazorpay() {
       // 1. Load Razorpay script
       const scriptLoaded = await loadRazorpayScript()
       if (!scriptLoaded) {
-        addToast({ message: 'Payment service unavailable. Try COD.', type: 'error' })
+        addToast({ message: 'Payment service temporarily unavailable. Please check your internet connection or try again.', type: 'error' })
         if (onFailure) onFailure(new Error('Razorpay script load failed'))
         setLoading(false)
         return

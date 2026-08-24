@@ -706,9 +706,9 @@ export default function CategoryListing() {
               </div>
             )}
 
-            {/* Product grid - 2 columns mobile, 3-4 columns desktop */}
+            {/* Product grid - 2 columns mobile, 3-4 columns desktop/widescreen */}
             <div
-              className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6"
+              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-3 md:gap-6 2xl:gap-8"
               aria-live="polite"
               aria-label={`${filteredProducts.length} products found`}
             >

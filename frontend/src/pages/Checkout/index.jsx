@@ -21,57 +21,90 @@ const CHECKOUT_STEPS = [
   { id: 'summary', label: 'Order Summary', icon: 'receipt' },
 ]
 
-function generateDeliverySlots() {
-  const now = new Date()
+// Generate available delivery dates (next 7 days starting today)
+function getAvailableDates() {
+  const dates = []
+  const today = new Date()
   
-  const getSlotsForDate = (date, isToday) => {
-    const day = date.getDay()
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today)
+    d.setDate(today.getDate() + i)
+    
+    const day = d.getDay() // 0 = Sunday, 6 = Saturday
     const isWeekend = day === 0 || day === 6
-    const startHour = isWeekend ? 6 : 10
-    const endHour = 18 // 6 PM
-    
-    const slots = []
-    const currentHour = now.getHours()
-    
-    for (let h = startHour; h < endHour; h += 2) {
-      if (!isToday || h > currentHour) {
-        const formatHour = (hour) => {
-          const ampm = hour >= 12 ? 'PM' : 'AM'
-          const displayHour = hour > 12 ? hour - 12 : hour
-          return `${displayHour} ${ampm}`
-        }
-        
-        const dateString = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-        const timeString = `${formatHour(h)} – ${formatHour(h+2)}`
-        
-        slots.push({
-          id: `${dateString} | ${timeString}`,
-          date: dateString,
-          time: timeString
-        })
-      }
-    }
-    return slots
+    const isToday = i === 0
+    const isTomorrow = i === 1
+
+    const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const dateFormatted = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+    const dayName = d.toLocaleDateString('en-US', { weekday: 'short' })
+    const dayFull = d.toLocaleDateString('en-US', { weekday: 'long' })
+    const monthName = d.toLocaleDateString('en-US', { month: 'short' })
+    const dayNumber = d.getDate()
+
+    dates.push({
+      dateObj: d,
+      dateKey,
+      dateFormatted,
+      dayName,
+      dayFull,
+      monthName,
+      dayNumber,
+      isWeekend,
+      isToday,
+      isTomorrow
+    })
+  }
+  return dates
+}
+
+// Generate delivery slots for a selected date
+function getSlotsForSelectedDate(dateObj, isToday) {
+  const day = dateObj.getDay()
+  const isWeekend = day === 0 || day === 6 // Saturday or Sunday
+  
+  // Weekday: 10:00 AM – 6:00 PM (10-12, 12-2, 2-4, 4-6)
+  // Weekend: 6:00 AM – 6:00 PM (6-8, 8-10, 10-12, 12-2, 2-4, 4-6)
+  const startHour = isWeekend ? 6 : 10
+  const endHour = 18 // 6 PM
+  
+  const currentHour = new Date().getHours()
+  const slots = []
+
+  const formatHour = (hour) => {
+    const ampm = hour >= 12 ? 'PM' : 'AM'
+    const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour)
+    return `${displayHour}:00 ${ampm}`
   }
 
-  let slots = getSlotsForDate(now, true)
-  
-  if (slots.length === 0) {
-    const tomorrow = new Date(now)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    slots = getSlotsForDate(tomorrow, false)
+  for (let h = startHour; h < endHour; h += 2) {
+    const isPast = isToday && h <= currentHour
+    const timeRange = `${formatHour(h)} – ${formatHour(h + 2)}`
+    
+    let tag = null
+    if (isWeekend && h === 6) tag = '🌅 Early Catch'
+    else if (isWeekend && h === 8) tag = '✨ Morning Fresh'
+    
+    const dateFormatted = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+    
+    slots.push({
+      id: `${dateFormatted} | ${timeRange}`,
+      dateFormatted,
+      timeRange,
+      startHour: h,
+      endHour: h + 2,
+      isPast,
+      tag
+    })
   }
-  
+
   return slots
 }
 
-const DELIVERY_SLOTS = generateDeliverySlots()
-
 const PAYMENT_METHODS = [
-  { id: 'upi', label: 'UPI', icon: 'qr_code', description: 'GPay, PhonePe, BHIM, Paytm' },
+  { id: 'upi', label: 'UPI', icon: 'qr_code', description: 'Google Pay, PhonePe, Paytm, BHIM' },
   { id: 'card', label: 'Credit / Debit Card', icon: 'credit_card', description: 'Visa, Mastercard, RuPay' },
-  { id: 'netbanking', label: 'Net Banking', icon: 'account_balance', description: 'All major banks supported' },
-  { id: 'cod', label: 'Cash on Delivery', icon: 'payments', description: 'Pay when your order arrives (up to ₹5,000)' },
+  { id: 'netbanking', label: 'Net Banking', icon: 'account_balance', description: 'All major Indian banks supported' },
 ]
 
 const addressSchema = z.object({
@@ -96,9 +129,15 @@ export default function Checkout() {
   const { items, subtotal, discount, total, clearCart } = useCart()
   const { addToast } = useToastStore()
 
+  const availableDates = getAvailableDates()
+  const todaySlots = getSlotsForSelectedDate(availableDates[0].dateObj, true)
+  const hasSlotsToday = todaySlots.some(s => !s.isPast)
+  const defaultDate = hasSlotsToday ? availableDates[0] : (availableDates[1] || availableDates[0])
+
   const [step, setStep] = useState('address')
+  const [selectedDate, setSelectedDate] = useState(defaultDate)
   const [selectedSlot, setSelectedSlot] = useState(null)
-  const [selectedPayment, setSelectedPayment] = useState(null)
+  const [selectedPayment, setSelectedPayment] = useState(PAYMENT_METHODS[0].id)
   const [placingOrder, setPlacingOrder] = useState(false)
   const [successOrderRef, setSuccessOrderRef] = useState(null)
 
@@ -202,61 +241,39 @@ export default function Checkout() {
       ? `${orderAddress.line1 || ''}, ${orderAddress.city || ''}, ${orderAddress.state || ''}`.trim()
       : ''
 
-    if (selectedPayment === 'upi' || selectedPayment === 'card' || selectedPayment === 'netbanking') {
-      initiatePayment({
-        amount: total,
-        name: user?.name,
-        email: user?.email,
-        phone: user?.phone || orderAddress?.phone || '',
-        address: addressString,
-        onSuccess: async (paymentData) => {
-          setPlacingOrder(true)
-          try {
-            const { orderId } = await placeOrder({
-              items,
-              address: orderAddress,
-              slot: selectedSlot,
-              paymentMethod: 'razorpay',
-              razorpayOrderId: paymentData.razorpayOrderId,
-              razorpayPaymentId: paymentData.razorpayPaymentId,
-              razorpaySignature: paymentData.razorpaySignature,
-            })
-            clearCart()
-            sessionStorage.setItem('justCompletedOrderId', orderId)
-            addToast({ message: '🎉 Order placed successfully!', type: 'success', duration: 5000 })
-            setSuccessOrderRef(orderId)
-          } catch (err) {
-            console.error('Order placement error:', err)
-            addToast({ message: 'Something went wrong while placing the order. Please contact support.', type: 'error' })
-          } finally {
-            setPlacingOrder(false)
-          }
-        },
-        onFailure: (err) => {
-          console.error('Razorpay payment failed:', err)
+    initiatePayment({
+      amount: total,
+      name: user?.name,
+      email: user?.email,
+      phone: user?.phone || orderAddress?.phone || '',
+      address: addressString,
+      onSuccess: async (paymentData) => {
+        setPlacingOrder(true)
+        try {
+          const { orderId } = await placeOrder({
+            items,
+            address: orderAddress,
+            slot: selectedSlot,
+            paymentMethod: 'razorpay',
+            razorpayOrderId: paymentData.razorpayOrderId,
+            razorpayPaymentId: paymentData.razorpayPaymentId,
+            razorpaySignature: paymentData.razorpaySignature,
+          })
+          clearCart()
+          sessionStorage.setItem('justCompletedOrderId', orderId)
+          addToast({ message: '🎉 Order placed successfully!', type: 'success', duration: 5000 })
+          setSuccessOrderRef(orderId)
+        } catch (err) {
+          console.error('Order placement error:', err)
+          addToast({ message: 'Something went wrong while placing the order. Please contact support.', type: 'error' })
+        } finally {
+          setPlacingOrder(false)
         }
-      })
-      return
-    }
-
-    setPlacingOrder(true)
-    try {
-      const { orderId } = await placeOrder({
-        items,
-        address: orderAddress,
-        slot: selectedSlot,
-        paymentMethod: 'cod',
-      })
-      clearCart()
-      sessionStorage.setItem('justCompletedOrderId', orderId)
-      addToast({ message: '🎉 Order placed successfully!', type: 'success', duration: 5000 })
-      setSuccessOrderRef(orderId)
-    } catch (err) {
-      console.error('COD order error:', err)
-      addToast({ message: 'Something went wrong. Please try again.', type: 'error' })
-    } finally {
-      setPlacingOrder(false)
-    }
+      },
+      onFailure: (err) => {
+        console.error('Razorpay payment failed:', err)
+      }
+    })
   }
 
   if (items.length === 0 && !successOrderRef) {
@@ -376,50 +393,221 @@ export default function Checkout() {
                     </>
                   )}
 
-                  <Button variant="primary" className="w-full" onClick={handleContinueAddress}>
-                    Continue to Delivery Slot
-                  </Button>
+                  <div className="flex gap-3 pt-2">
+                    <Button variant="secondary" onClick={() => navigate('/cart')}>
+                      Back
+                    </Button>
+                    <Button variant="primary" className="flex-1" onClick={handleContinueAddress}>
+                      Continue to Delivery Slot
+                    </Button>
+                  </div>
                 </motion.div>
               )}
 
               {/* STEP 2: Slot */}
-              {step === 'slot' && (
-                <motion.div
-                  key="slot"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-4"
-                >
-                  <h2 className="text-headline-sm text-on-surface">Preferred Delivery Slot</h2>
-                  <p className="text-body-md text-on-surface-variant">
-                    Select a delivery time window. All slots include our cold-chain guarantee.
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {DELIVERY_SLOTS.map((slot) => (
-                      <button
-                        key={slot.id}
-                        onClick={() => setSelectedSlot(slot.id)}
-                        aria-pressed={selectedSlot === slot.id}
-                        className={`p-4 rounded-[16px] border-2 transition-all flex flex-col items-center justify-center ${
-                          selectedSlot === slot.id
-                            ? 'bg-primary text-on-primary border-primary shadow-sm'
-                            : 'bg-white text-on-surface border-outline-variant hover:border-primary'
-                        }`}
+              {step === 'slot' && (() => {
+                const currentSlots = getSlotsForSelectedDate(selectedDate.dateObj, selectedDate.isToday)
+                const allSlotsPassed = currentSlots.every(s => s.isPast)
+
+                return (
+                  <motion.div
+                    key="slot"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-headline-sm text-on-surface mb-1">Select Delivery Date & Time</h2>
+                      <p className="text-body-md text-on-surface-variant">
+                        Choose your preferred delivery date and time slot. All slots include our cold-chain freshness guarantee.
+                      </p>
+                    </div>
+
+                    {/* 1. Date Selector */}
+                    <div>
+                      <label className="text-label-md font-bold text-on-surface mb-3 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">calendar_month</span>
+                        <span>1. Select Delivery Date</span>
+                      </label>
+
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
+                        {availableDates.map((d) => {
+                          const isSelected = selectedDate.dateKey === d.dateKey
+                          return (
+                            <button
+                              key={d.dateKey}
+                              type="button"
+                              onClick={() => {
+                                setSelectedDate(d)
+                                setSelectedSlot(null)
+                              }}
+                              className={`p-3 rounded-[16px] border-2 transition-all flex flex-col items-center justify-between text-center relative cursor-pointer ${
+                                isSelected
+                                  ? 'bg-primary text-on-primary border-primary shadow-md scale-[1.02]'
+                                  : 'bg-white text-on-surface border-outline-variant hover:border-primary/60 hover:bg-surface-container-lowest'
+                              }`}
+                            >
+                              {d.isToday ? (
+                                <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full mb-1 ${
+                                  isSelected ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'
+                                }`}>
+                                  Today
+                                </span>
+                              ) : d.isWeekend ? (
+                                <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full mb-1 ${
+                                  isSelected ? 'bg-amber-400 text-slate-950' : 'bg-amber-100 text-amber-800'
+                                }`}>
+                                  Weekend
+                                </span>
+                              ) : (
+                                <span className="h-4 mb-1" />
+                              )}
+
+                              <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                                isSelected ? 'text-on-primary/90' : 'text-on-surface-variant'
+                              }`}>
+                                {d.dayName}
+                              </span>
+
+                              <span className="text-xl font-black my-0.5">
+                                {d.dayNumber}
+                              </span>
+
+                              <span className={`text-[11px] font-medium ${
+                                isSelected ? 'text-on-primary/80' : 'text-on-surface-variant'
+                              }`}>
+                                {d.monthName}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 2. Operating Hours Info Banner */}
+                    <div className={`p-4 rounded-[16px] border flex items-start gap-3 transition-all ${
+                      selectedDate.isWeekend
+                        ? 'bg-amber-50/90 border-amber-200 text-amber-950'
+                        : 'bg-blue-50/90 border-blue-200 text-blue-950'
+                    }`}>
+                      <span className={`material-symbols-outlined text-2xl shrink-0 mt-0.5 ${
+                        selectedDate.isWeekend ? 'text-amber-700' : 'text-blue-700'
+                      }`} aria-hidden="true">
+                        {selectedDate.isWeekend ? 'wb_twilight' : 'storefront'}
+                      </span>
+                      <div className="text-sm">
+                        <p className="font-bold text-[13px] sm:text-sm">
+                          {selectedDate.isWeekend
+                            ? `Weekend Operating Hours (${selectedDate.dayFull}): 6:00 AM – 6:00 PM`
+                            : `Weekday Operating Hours (${selectedDate.dayFull}): 10:00 AM – 6:00 PM`}
+                        </p>
+                        <p className="text-xs opacity-90 mt-0.5 leading-relaxed">
+                          {selectedDate.isWeekend
+                            ? '🌅 Weekend Special! Early morning fresh catch & delivery slots available starting from 6:00 AM.'
+                            : 'Standard weekday delivery operating hours with 2-hour guaranteed fresh slots.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 3. Time Slots */}
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="text-label-md font-bold text-on-surface flex items-center gap-2">
+                          <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">schedule</span>
+                          <span>2. Select Delivery Time for {selectedDate.dateFormatted}</span>
+                        </label>
+                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                          selectedDate.isWeekend
+                            ? 'text-amber-800 bg-amber-100 border border-amber-200'
+                            : 'text-blue-800 bg-blue-100 border border-blue-200'
+                        }`}>
+                          {selectedDate.isWeekend ? '6 Weekend Slots' : '4 Weekday Slots'}
+                        </span>
+                      </div>
+
+                      {allSlotsPassed ? (
+                        <div className="bg-white rounded-[16px] p-6 text-center border border-outline-variant">
+                          <span className="material-symbols-outlined text-slate-400 text-3xl mb-2" aria-hidden="true">event_busy</span>
+                          <p className="font-semibold text-on-surface">No slots remaining for today</p>
+                          <p className="text-body-sm text-on-surface-variant mt-1">
+                            Operating hours for today have closed. Please choose tomorrow or another upcoming date above.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {currentSlots.map((slot) => {
+                            const isSelected = selectedSlot === slot.id
+
+                            if (slot.isPast) {
+                              return (
+                                <div
+                                  key={slot.id}
+                                  className="p-4 rounded-[16px] border border-outline-variant/50 bg-surface-container-lowest opacity-50 flex items-center justify-between cursor-not-allowed"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-slate-400 text-lg" aria-hidden="true">history</span>
+                                    <div>
+                                      <p className="text-xs text-on-surface-variant font-medium line-through">{slot.timeRange}</p>
+                                      <span className="text-[10px] text-red-500 font-semibold uppercase">Slot Passed</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )
+                            }
+
+                            return (
+                              <button
+                                key={slot.id}
+                                type="button"
+                                onClick={() => setSelectedSlot(slot.id)}
+                                aria-pressed={isSelected}
+                                className={`p-4 rounded-[16px] border-2 transition-all flex flex-col items-start justify-between text-left relative cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-primary text-on-primary border-primary shadow-sm scale-[1.01]'
+                                    : 'bg-white text-on-surface border-outline-variant hover:border-primary'
+                                }`}
+                              >
+                                <div className="w-full flex items-center justify-between mb-1.5">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="material-symbols-outlined text-lg" aria-hidden="true">schedule</span>
+                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                                      isSelected ? 'text-on-primary/80' : 'text-on-surface-variant'
+                                    }`}>
+                                      {selectedDate.dayName}
+                                    </span>
+                                  </div>
+                                  {slot.tag && (
+                                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                                      isSelected ? 'bg-amber-400 text-slate-950' : 'bg-amber-100 text-amber-800'
+                                    }`}>
+                                      {slot.tag}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-label-md font-extrabold">{slot.timeRange}</span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                      <Button variant="secondary" onClick={() => setStep('address')}>Back</Button>
+                      <Button
+                        variant="primary"
+                        className="flex-1"
+                        disabled={!selectedSlot}
+                        onClick={handleNextFromSlot}
                       >
-                        <span className="material-symbols-outlined block mb-1" style={{ fontSize: '20px' }} aria-hidden="true">schedule</span>
-                        <span className={`text-[11px] font-medium uppercase tracking-wider mb-0.5 ${selectedSlot === slot.id ? 'text-on-primary/80' : 'text-on-surface-variant'}`}>{slot.date}</span>
-                        <span className="text-label-md font-bold">{slot.time}</span>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex gap-3">
-                    <Button variant="secondary" onClick={() => setStep('address')}>Back</Button>
-                    <Button variant="primary" className="flex-1" onClick={handleNextFromSlot}>Continue to Payment</Button>
-                  </div>
-                </motion.div>
-              )}
+                        Continue to Payment
+                      </Button>
+                    </div>
+                  </motion.div>
+                )
+              })()}
 
               {/* STEP 3: Payment */}
               {step === 'payment' && (
@@ -431,7 +619,18 @@ export default function Checkout() {
                   transition={{ duration: 0.2 }}
                   className="space-y-4"
                 >
-                  <h2 className="text-headline-sm text-on-surface">Payment Method</h2>
+                  <div>
+                    <h2 className="text-headline-sm text-on-surface mb-1">Select Payment Method</h2>
+                    <p className="text-body-md text-on-surface-variant">
+                      All online transactions are 100% secure and processed via Razorpay.
+                    </p>
+                  </div>
+
+                  <div className="bg-emerald-50 border border-emerald-200/80 rounded-[16px] p-3.5 flex items-center gap-3 text-emerald-950 text-xs font-semibold">
+                    <span className="material-symbols-outlined text-emerald-600 text-xl shrink-0" aria-hidden="true">verified_user</span>
+                    <span>100% Encrypted & Secure Payment. Instant order confirmation with live status tracking.</span>
+                  </div>
+
                   {PAYMENT_METHODS.map((method) => (
                     <div key={method.id}>
                       <label
@@ -459,7 +658,7 @@ export default function Checkout() {
                       </label>
                     </div>
                   ))}
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 pt-2">
                     <Button variant="secondary" onClick={() => setStep('slot')}>Back</Button>
                     <Button variant="primary" className="flex-1" onClick={handleNextFromPayment}>Review Order</Button>
                   </div>

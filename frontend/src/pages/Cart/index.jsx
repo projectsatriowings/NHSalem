@@ -36,10 +36,18 @@ export default function Cart() {
   const { addToast } = useToastStore()
   const user = useAuthStore((s) => s.user)
 
+  // Zero-flicker toggle state: starts false so it never flashes on reload when toggle is OFF
+  const [showCouponInput, setShowCouponInput] = useState(() => {
+    try {
+      return typeof window !== 'undefined' && sessionStorage.getItem('promo_banner_enabled') === 'true'
+    } catch (_) {
+      return false
+    }
+  })
+
   const [couponCode, setCouponCode] = useState('')
   const [couponLoading, setCouponLoading] = useState(false)
   const [couponError, setCouponError] = useState('')
-  const [showCouponInput, setShowCouponInput] = useState(true)
   const [removedItem, setRemovedItem] = useState(null)
   const [recentOrder, setRecentOrder] = useState(null)
   const [recommended, setRecommended] = useState([])
@@ -53,6 +61,25 @@ export default function Cart() {
       }
     }
   }, [items.length])
+
+  // Sync coupon visibility with the admin promo toggle
+  useEffect(() => {
+    let isMounted = true
+    getPublicPromoSettings()
+      .then((res) => {
+        if (!isMounted) return
+        const isEnabled = Boolean(res.success && res.banner?.enabled)
+        setShowCouponInput(isEnabled)
+        try {
+          sessionStorage.setItem('promo_banner_enabled', String(isEnabled))
+        } catch (_) {}
+      })
+      .catch((err) => {
+        console.error('Failed to load promo settings for cart', err)
+        if (isMounted) setShowCouponInput(false)
+      })
+    return () => { isMounted = false }
+  }, [])
 
   // When the basket is empty, pull a few products to help the customer
   // start shopping again instead of staring at a blank page.
@@ -68,17 +95,6 @@ export default function Cart() {
         .catch(() => setRecommended([]))
     }
   }, [items.length])
-
-  // Check if coupon input should be visible based on master toggle
-  useEffect(() => {
-    getPublicPromoSettings()
-      .then((res) => {
-        if (res.success && res.banner) {
-          setShowCouponInput(res.banner.enabled)
-        }
-      })
-      .catch((err) => console.error('Failed to load promo settings for cart', err))
-  }, [])
 
   const handleRemove = (item) => {
     setRemovedItem({ ...item })
@@ -320,7 +336,7 @@ export default function Cart() {
 
           {/* Order Summary */}
           <div className="space-y-4">
-            {/* Coupon (Hidden if master toggle is OFF) */}
+            {/* Coupon (Only visible when promo toggle is ON) */}
             {showCouponInput && (
               <div className="bg-white rounded-[20px] shadow-card p-5">
                 <h2 className="text-label-md font-semibold text-on-surface mb-3 flex items-center gap-2">
@@ -328,47 +344,47 @@ export default function Cart() {
                   Apply Coupon
                 </h2>
                 {coupon ? (
-                <div className="flex items-center justify-between bg-success/10 rounded-[12px] px-4 py-3">
-                  <div>
-                    <p className="text-label-md font-semibold text-success">{coupon.code}</p>
-                    <p className="text-label-sm text-on-surface-variant">{coupon.description}</p>
-                  </div>
-                  <button
-                    onClick={removeCoupon}
-                    aria-label="Remove coupon"
-                    className="text-error hover:opacity-80"
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }} aria-hidden="true">close</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={couponCode}
-                      onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError('') }}
-                      placeholder="Enter coupon code"
-                      aria-label="Coupon code"
-                      aria-invalid={!!couponError}
-                      className="flex-1 rounded-full border border-outline-variant bg-surface-container-low px-4 py-2.5 text-label-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/15 outline-none uppercase"
-                    />
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      loading={couponLoading}
-                      disabled={!couponCode.trim()}
-                      onClick={handleApplyCoupon}
+                  <div className="flex items-center justify-between bg-success/10 rounded-[12px] px-4 py-3">
+                    <div>
+                      <p className="text-label-md font-semibold text-success">{coupon.code}</p>
+                      <p className="text-label-sm text-on-surface-variant">{coupon.description}</p>
+                    </div>
+                    <button
+                      onClick={removeCoupon}
+                      aria-label="Remove coupon"
+                      className="text-error hover:opacity-80"
                     >
-                      Apply
-                    </Button>
+                      <span className="material-symbols-outlined" style={{ fontSize: '20px' }} aria-hidden="true">close</span>
+                    </button>
                   </div>
-                  {couponError && (
-                    <p role="alert" className="text-label-sm text-error pl-2">{couponError}</p>
-                  )}
-                </div>
-              )}
-            </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError('') }}
+                        placeholder="Enter coupon code"
+                        aria-label="Coupon code"
+                        aria-invalid={!!couponError}
+                        className="flex-1 rounded-full border border-outline-variant bg-surface-container-low px-4 py-2.5 text-label-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/15 outline-none uppercase"
+                      />
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        loading={couponLoading}
+                        disabled={!couponCode.trim()}
+                        onClick={handleApplyCoupon}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                    {couponError && (
+                      <p role="alert" className="text-label-sm text-error pl-2">{couponError}</p>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Price breakdown */}

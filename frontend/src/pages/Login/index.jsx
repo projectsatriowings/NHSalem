@@ -94,7 +94,7 @@ function EmailForm({ onSuccess, setMode }) {
   }
 
   const inputCls = (hasError) =>
-    `flex-1 bg-transparent text-sm font-medium text-on-surface placeholder:text-outline/70 focus:outline-none disabled:opacity-60 ${hasError ? 'text-red-700' : ''}`
+    `w-full min-w-0 flex-1 bg-transparent text-sm font-medium text-on-surface placeholder:text-outline/70 focus:outline-none disabled:opacity-60 ${hasError ? 'text-red-700' : ''}`
 
   const wrapCls = (hasError) =>
     `flex items-center gap-2 px-3 py-1.5 rounded-full border bg-surface-container-low transition-all duration-150 ${
@@ -154,9 +154,10 @@ function EmailForm({ onSuccess, setMode }) {
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="text-outline hover:text-on-surface transition-colors flex-shrink-0"
+            title={showPassword ? 'Hide password' : 'Show password'}
+            className="w-7 h-7 flex items-center justify-center rounded-full text-outline hover:text-primary hover:bg-black/5 active:bg-black/10 transition-colors flex-shrink-0 cursor-pointer select-none"
           >
-            <span className="material-symbols-outlined leading-none" style={{ fontSize: '16px' }}>
+            <span className="material-symbols-outlined leading-none" style={{ fontSize: '18px' }}>
               {showPassword ? 'visibility_off' : 'visibility'}
             </span>
           </button>
@@ -247,7 +248,7 @@ function PhoneForm({ onSuccess, setMode }) {
   }
 
   const inputCls = (hasError) =>
-    `flex-1 bg-transparent text-sm font-medium text-on-surface placeholder:text-outline/70 focus:outline-none disabled:opacity-60 ${hasError ? 'text-red-700' : ''}`
+    `w-full min-w-0 flex-1 bg-transparent text-sm font-medium text-on-surface placeholder:text-outline/70 focus:outline-none disabled:opacity-60 ${hasError ? 'text-red-700' : ''}`
 
   const wrapCls = (hasError) =>
     `flex items-center gap-2 px-3 py-1.5 rounded-full border bg-surface-container-low transition-all duration-150 ${
@@ -313,9 +314,10 @@ function PhoneForm({ onSuccess, setMode }) {
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="text-outline hover:text-on-surface transition-colors flex-shrink-0"
+            title={showPassword ? 'Hide password' : 'Show password'}
+            className="w-7 h-7 flex items-center justify-center rounded-full text-outline hover:text-primary hover:bg-black/5 active:bg-black/10 transition-colors flex-shrink-0 cursor-pointer select-none"
           >
-            <span className="material-symbols-outlined leading-none" style={{ fontSize: '16px' }}>
+            <span className="material-symbols-outlined leading-none" style={{ fontSize: '18px' }}>
               {showPassword ? 'visibility_off' : 'visibility'}
             </span>
           </button>
@@ -409,7 +411,7 @@ function RegisterForm({ onSuccess }) {
   }
 
   const inputCls = (hasError) =>
-    `flex-1 bg-transparent text-sm font-medium text-on-surface placeholder:text-outline/70 focus:outline-none disabled:opacity-60 ${hasError ? 'text-red-700' : ''}`
+    `w-full min-w-0 flex-1 bg-transparent text-sm font-medium text-on-surface placeholder:text-outline/70 focus:outline-none disabled:opacity-60 ${hasError ? 'text-red-700' : ''}`
 
   const wrapCls = (hasError) =>
     `flex items-center gap-2 px-3 h-10 rounded-full border bg-surface-container-low transition-all duration-150 ${
@@ -490,9 +492,9 @@ function RegisterForm({ onSuccess }) {
       </div>
 
       {/* Password fields row */}
-      <div className="flex flex-col md:flex-row gap-3 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Password */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0">
           <label htmlFor="reg-password" className="block text-[11px] font-bold text-on-surface mb-1 truncate">
             Password <span className="text-red-500">*</span>
           </label>
@@ -511,9 +513,11 @@ function RegisterForm({ onSuccess }) {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="text-outline hover:text-on-surface transition-colors flex-shrink-0"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              title={showPassword ? 'Hide password' : 'Show password'}
+              className="w-7 h-7 flex items-center justify-center rounded-full text-outline hover:text-primary hover:bg-black/5 active:bg-black/10 transition-colors flex-shrink-0 cursor-pointer select-none"
             >
-              <span className="material-symbols-outlined leading-none" style={{ fontSize: '15px' }}>
+              <span className="material-symbols-outlined leading-none" style={{ fontSize: '18px' }}>
                 {showPassword ? 'visibility_off' : 'visibility'}
               </span>
             </button>
@@ -522,7 +526,7 @@ function RegisterForm({ onSuccess }) {
         </div>
 
         {/* Confirm Password */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0">
           <label htmlFor="reg-confirm-password" className="block text-[11px] font-bold text-on-surface mb-1 truncate">
             Confirm Password <span className="text-red-500">*</span>
           </label>
@@ -541,9 +545,11 @@ function RegisterForm({ onSuccess }) {
             <button
               type="button"
               onClick={() => setShowConfirmPassword((v) => !v)}
-              className="text-outline hover:text-on-surface transition-colors flex-shrink-0"
+              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              title={showConfirmPassword ? 'Hide password' : 'Show password'}
+              className="w-7 h-7 flex items-center justify-center rounded-full text-outline hover:text-primary hover:bg-black/5 active:bg-black/10 transition-colors flex-shrink-0 cursor-pointer select-none"
             >
-              <span className="material-symbols-outlined leading-none" style={{ fontSize: '15px' }}>
+              <span className="material-symbols-outlined leading-none" style={{ fontSize: '18px' }}>
                 {showConfirmPassword ? 'visibility_off' : 'visibility'}
               </span>
             </button>
@@ -643,7 +649,7 @@ function ForgotPasswordForm({ setMode }) {
   }
 
   const inputCls = (hasError) =>
-    `flex-1 bg-transparent text-sm font-medium text-on-surface placeholder:text-outline/70 focus:outline-none disabled:opacity-60 ${hasError ? 'text-red-700' : ''}`
+    `w-full min-w-0 flex-1 bg-transparent text-sm font-medium text-on-surface placeholder:text-outline/70 focus:outline-none disabled:opacity-60 ${hasError ? 'text-red-700' : ''}`
 
   const wrapCls = (hasError) =>
     `flex items-center gap-2 px-3 py-2 rounded-full border bg-surface-container-low transition-all duration-150 ${
@@ -719,9 +725,11 @@ function ForgotPasswordForm({ setMode }) {
               <button
                 type="button"
                 onClick={() => setShowPassword(v => !v)}
-                className="text-outline hover:text-on-surface transition-colors"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
+                className="w-7 h-7 flex items-center justify-center rounded-full text-outline hover:text-primary hover:bg-black/5 active:bg-black/10 transition-colors flex-shrink-0 cursor-pointer select-none"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                <span className="material-symbols-outlined leading-none" style={{ fontSize: '18px' }}>
                   {showPassword ? 'visibility_off' : 'visibility'}
                 </span>
               </button>

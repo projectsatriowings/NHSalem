@@ -34,7 +34,7 @@ const FAQS = [
   {
     id: 'faq-6',
     title: 'Payment methods accepted',
-    content: 'We accept all major Credit/Debit Cards, UPI, Net Banking, and Cash on Delivery (COD) for eligible orders.',
+    content: 'We accept all major Credit/Debit Cards, UPI (Google Pay, PhonePe, Paytm, BHIM), and Net Banking via our secure 100% encrypted online payment gateway.',
   },
 ]
 

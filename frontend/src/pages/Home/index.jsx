@@ -198,28 +198,28 @@ export default function Home() {
                   Changed bg-cover to a responsive bg-contain on large screens or a right-aligned cover. 
                 */}
                 <div
-                  className="absolute inset-0 bg-[position:right_bottom] lg:bg-[position:right_center] lg:bg-contain bg-cover bg-no-repeat scale-100 transition-transform duration-[8000ms] ease-out"
+                  className="absolute inset-0 bg-cover bg-[position:center_right] sm:bg-[position:right_center] lg:bg-[position:right_center] bg-no-repeat scale-100 transition-transform duration-[8000ms] ease-out"
                   style={{ backgroundImage: `url(${slide.bg})` }}
                 />
                 
                 {/* Strengthened gradient pushed further to the right to completely mask the watermark text */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#000516] via-[#000516]/98 via-50% to-transparent/30 lg:via-60%" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#000516] via-[#000516]/95 via-45% to-transparent/30 lg:via-55% xl:via-50% 2xl:via-45%" />
 
                 {/* Rely entirely on internal padding for height, ensuring the content is perfectly visible and leaves room for the baked-in icons at the bottom */}
-                <div className="container-max relative flex flex-col justify-center text-left text-white z-10 pt-20 pb-28 md:pt-28 md:pb-32">
+                <div className="container-max relative flex flex-col justify-center text-left text-white z-10 pt-20 pb-28 md:pt-28 md:pb-32 lg:pt-32 lg:pb-36 2xl:pt-36 2xl:pb-44">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                    className="max-w-2xl"
+                    className="max-w-2xl 2xl:max-w-3xl"
                   >
                     <span className="inline-block px-3.5 py-1.5 rounded-full bg-[#fed255]/20 border border-[#fed255]/40 text-[#fed255] text-xs font-bold uppercase tracking-wider mb-3">
                       {slide.badge}
                     </span>
-                    <h1 className="text-display-lg-mobile md:text-display-lg text-white font-extrabold mb-3 leading-tight">
+                    <h1 className="text-display-lg-mobile md:text-display-lg 2xl:text-6xl text-white font-extrabold mb-3 leading-tight">
                       {slide.headline}
                     </h1>
-                    <p className="text-body-lg text-slate-200 mb-6 max-w-xl leading-relaxed">
+                    <p className="text-body-lg 2xl:text-xl text-slate-200 mb-6 max-w-xl 2xl:max-w-2xl leading-relaxed">
                       {slide.sub}
                     </p>
                     <div className="flex flex-wrap items-center gap-4">
@@ -312,7 +312,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 2xl:gap-8">
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
             ) : (
@@ -350,7 +350,7 @@ export default function Home() {
           </div>
 
           {/* 4 Core Commitment Cards with 4 DISTINCT Icons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 2xl:gap-8">
             {ABOUT_COMMITMENTS.map((item, i) => (
               <motion.div
                 key={item.title}
@@ -381,7 +381,7 @@ export default function Home() {
           </div>
 
           {/* 6 Core Trust Cards - All Uniform Icon Circles */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 2xl:gap-8 mb-12">
             {TRUST_POINTS.map((item, i) => (
               <motion.div
                 key={item.title}
@@ -436,7 +436,7 @@ export default function Home() {
           </div>
 
           {testimonials.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 2xl:gap-8">
               {testimonials.map((t, i) => (
                 <motion.div
                   key={i}

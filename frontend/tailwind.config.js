@@ -108,7 +108,21 @@ export default {
         "nav": "0 2px 24px rgba(0, 5, 22, 0.12)",
       },
       maxWidth: {
-        "container": "1280px",
+        "container": "1800px",
+        "container-sm": "1280px",
+        "container-md": "1480px",
+        "container-lg": "1680px",
+        "container-xl": "1800px",
+      },
+      screens: {
+        'xs': '480px',
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px',
+        '3xl': '1720px',
+        '4k': '2160px',
       },
       backgroundImage: {
         "navy-gradient": "linear-gradient(135deg, #000516 0%, #0b1e3d 50%, #1a3060 100%)",
