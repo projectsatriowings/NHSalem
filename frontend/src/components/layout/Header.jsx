@@ -311,9 +311,6 @@ function Header({ onLoginClick, mobileMenuOpen, setMobileMenuOpen }) {
               />
             )}
 
-            {/* Divider */}
-            <span className="w-px h-4 bg-outline-variant/40 mx-0.5 flex-shrink-0" />
-
             {/* Wishlist */}
             <Link to="/wishlist" aria-label={`Wishlist, ${wishlistCount} items`}>
               <IconButton
@@ -325,8 +322,9 @@ function Header({ onLoginClick, mobileMenuOpen, setMobileMenuOpen }) {
               />
             </Link>
 
-            {/* Cart */}
-            <Link to="/cart" aria-label={`Shopping cart, ${totalItems} items`}>
+            {/* Cart (Desktop only — on mobile, the sticky bottom nav handles Cart navigation) */}
+            <span className="hidden md:block w-px h-4 bg-outline-variant/40 mx-0.5 flex-shrink-0" />
+            <Link to="/cart" className="hidden md:block" aria-label={`Shopping cart, ${totalItems} items`}>
               <motion.div
                 animate={totalItems > 0 ? { scale: [1, 1.2, 1] } : {}}
                 transition={{ duration: 0.3 }}

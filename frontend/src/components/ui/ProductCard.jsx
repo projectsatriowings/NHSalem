@@ -136,28 +136,28 @@ export default function ProductCard({ product }) {
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col gap-3 flex-1">
+      <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-3 flex-1">
         {/* Title & Subtitle */}
         <div>
           <Link to={`/product/${id}`}>
-            <h3 className="text-[17px] font-bold text-slate-900 tracking-tight line-clamp-1 hover:text-amber-600 transition-colors">
+            <h3 className="text-sm sm:text-[16px] font-bold text-slate-900 tracking-tight line-clamp-1 hover:text-amber-600 transition-colors">
               {name}
             </h3>
           </Link>
           {tagline && (
-            <p className="text-[13px] text-slate-500 mt-0.5 line-clamp-1 font-medium">{tagline}</p>
+            <p className="text-[11px] sm:text-[13px] text-slate-500 mt-0.5 line-clamp-1 font-medium">{tagline}</p>
           )}
         </div>
 
         {/* Weight/Quantity Selector */}
         {finalVariants.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1 flex-nowrap mt-1">
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide py-0.5 flex-nowrap mt-0.5">
             {finalVariants.map((v, i) => (
               <button
                 key={v.label}
                 onClick={() => setSelectedVariant(i)}
                 aria-pressed={selectedVariant === i}
-                className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all flex-shrink-0 ${selectedVariant === i
+                className={`px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider transition-all flex-shrink-0 ${selectedVariant === i
                     ? 'bg-slate-900 text-white shadow-sm'
                     : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-400 hover:bg-slate-50'
                   }`}
@@ -172,17 +172,17 @@ export default function ProductCard({ product }) {
         <div className="flex-1" />
 
         {/* Price & CTA Block */}
-        <div className="pt-2 border-t border-slate-100 mt-1">
-          <div className="flex items-center gap-2 mb-2">
-            <p className="text-lg font-black text-slate-900">
+        <div className="pt-1.5 sm:pt-2 border-t border-slate-100 mt-auto">
+          <div className="flex items-baseline gap-1.5 mb-1.5 sm:mb-2 flex-wrap">
+            <p className="text-base sm:text-lg font-black text-slate-900">
               ₹{currentVariant.onlinePrice?.toLocaleString()}
             </p>
             {currentVariant.mrp && currentVariant.mrp > currentVariant.onlinePrice && (
-              <div className="flex items-center gap-1.5">
-                <p className="text-sm text-slate-400 line-through font-medium">
+              <div className="flex items-center gap-1">
+                <p className="text-[11px] sm:text-xs text-slate-400 line-through font-medium">
                   ₹{currentVariant.mrp.toLocaleString()}
                 </p>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+                <span className="text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1 sm:px-1.5 py-0.5 rounded">
                   {Math.round(((currentVariant.mrp - currentVariant.onlinePrice) / currentVariant.mrp) * 100)}% OFF
                 </span>
               </div>
@@ -193,46 +193,46 @@ export default function ProductCard({ product }) {
             {!cartItem ? (
               <motion.button
                 key="add"
-                initial={{ opacity: 0, y: 5 }}
+                initial={{ opacity: 0, y: 3 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, y: -3 }}
+                transition={{ duration: 0.15 }}
                 onClick={handleAdd}
-                className="w-full flex items-center justify-center gap-2 bg-[#0a192f] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-800 active:scale-[0.98] transition-all shadow-sm"
+                className="w-full flex items-center justify-center gap-1.5 bg-[#0a192f] text-white px-3 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold hover:bg-slate-800 active:scale-[0.98] transition-all shadow-sm cursor-pointer select-none"
                 aria-label={`Add ${name} to cart`}
               >
-                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                <span className="material-symbols-outlined text-[16px] sm:text-[18px]" aria-hidden="true">
                   shopping_cart
                 </span>
-                Add to Cart
+                <span>Add to Cart</span>
               </motion.button>
             ) : (
               <motion.div
                 key="stepper"
-                initial={{ opacity: 0, y: 5 }}
+                initial={{ opacity: 0, y: 3 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.2 }}
-                className="w-full flex items-center justify-between bg-[#0a192f] rounded-xl overflow-hidden p-1 shadow-inner"
+                exit={{ opacity: 0, y: -3 }}
+                transition={{ duration: 0.15 }}
+                className="w-full h-8 sm:h-9 flex items-center justify-between bg-[#0a192f] rounded-xl overflow-hidden p-0.5 sm:p-1 shadow-inner"
               >
                 <button
                   onClick={handleDecrease}
                   aria-label="Decrease quantity"
-                  className="w-10 h-8 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  className="w-8 sm:w-9 h-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                  <span className="material-symbols-outlined text-[16px] sm:text-[18px]" aria-hidden="true">
                     remove
                   </span>
                 </button>
-                <span className="px-2 text-center text-white text-sm font-bold">
+                <span className="px-1 text-center text-white text-xs sm:text-sm font-bold">
                   {cartItem.quantity}
                 </span>
                 <button
                   onClick={handleIncrease}
                   aria-label="Increase quantity"
-                  className="w-10 h-8 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  className="w-8 sm:w-9 h-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                  <span className="material-symbols-outlined text-[16px] sm:text-[18px]" aria-hidden="true">
                     add
                   </span>
                 </button>

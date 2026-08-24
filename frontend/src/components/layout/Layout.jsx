@@ -80,7 +80,7 @@ export default function Layout({ children }) {
         setMobileMenuOpen={setMobileMenuOpen}
       />
 
-      <main className={`flex-1 w-full bg-slate-50 ${isCartBarVisible ? 'pb-20' : ''}`} id="main-content" tabIndex={-1}>
+      <main className={`flex-1 w-full bg-slate-50 pb-20 xl:pb-0 ${isCartBarVisible ? 'pb-32' : ''}`} id="main-content" tabIndex={-1}>
         <motion.div
           key={typeof window !== 'undefined' ? window.location.pathname : 'page'}
           variants={pageVariants}

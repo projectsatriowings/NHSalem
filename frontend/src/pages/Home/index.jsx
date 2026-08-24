@@ -198,36 +198,36 @@ export default function Home() {
                   Changed bg-cover to a responsive bg-contain on large screens or a right-aligned cover. 
                 */}
                 <div
-                  className="absolute inset-0 bg-cover bg-[position:center_right] sm:bg-[position:right_center] lg:bg-[position:right_center] bg-no-repeat scale-100 transition-transform duration-[8000ms] ease-out"
+                  className="absolute inset-0 bg-cover bg-[position:80%_center] sm:bg-[position:right_center] lg:bg-[position:right_center] bg-no-repeat scale-100 transition-transform duration-[8000ms] ease-out"
                   style={{ backgroundImage: `url(${slide.bg})` }}
                 />
                 
-                {/* Strengthened gradient pushed further to the right to completely mask the watermark text */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#000516] via-[#000516]/95 via-45% to-transparent/30 lg:via-55% xl:via-50% 2xl:via-45%" />
+                {/* Responsive Gradient Mask: tailored for mobile portrait overlay and widescreen desktop */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#000516] via-[#000516]/85 to-[#000516]/60 sm:bg-gradient-to-r sm:from-[#000516] sm:via-[#000516]/95 sm:via-45% sm:to-transparent/30 lg:via-55% xl:via-50% 2xl:via-45%" />
 
-                {/* Rely entirely on internal padding for height, ensuring the content is perfectly visible and leaves room for the baked-in icons at the bottom */}
-                <div className="container-max relative flex flex-col justify-center text-left text-white z-10 pt-20 pb-28 md:pt-28 md:pb-32 lg:pt-32 lg:pb-36 2xl:pt-36 2xl:pb-44">
+                {/* Padding scaled down for mobile so it fits naturally */}
+                <div className="container-max relative flex flex-col justify-center text-left text-white z-10 pt-10 pb-12 sm:pt-16 sm:pb-20 md:pt-24 md:pb-28 lg:pt-32 lg:pb-36 2xl:pt-36 2xl:pb-44">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="max-w-2xl 2xl:max-w-3xl"
                   >
-                    <span className="inline-block px-3.5 py-1.5 rounded-full bg-[#fed255]/20 border border-[#fed255]/40 text-[#fed255] text-xs font-bold uppercase tracking-wider mb-3">
+                    <span className="inline-block px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[#fed255]/20 border border-[#fed255]/40 text-[#fed255] text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3">
                       {slide.badge}
                     </span>
-                    <h1 className="text-display-lg-mobile md:text-display-lg 2xl:text-6xl text-white font-extrabold mb-3 leading-tight">
+                    <h1 className="text-2xl sm:text-4xl md:text-5xl 2xl:text-6xl text-white font-extrabold mb-2 sm:mb-3 leading-tight tracking-tight">
                       {slide.headline}
                     </h1>
-                    <p className="text-body-lg 2xl:text-xl text-slate-200 mb-6 max-w-xl 2xl:max-w-2xl leading-relaxed">
+                    <p className="text-xs sm:text-base 2xl:text-xl text-slate-200 mb-4 sm:mb-6 max-w-xl 2xl:max-w-2xl leading-relaxed line-clamp-3 sm:line-clamp-none">
                       {slide.sub}
                     </p>
-                    <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                       {/* Glassmorphism CTA Button with Backdrop Blur */}
                       <Link to="/category">
                         <button
                           type="button"
-                          className="px-8 py-3.5 rounded-full text-white font-bold text-sm tracking-wide transition-all duration-300 flex items-center gap-2 shadow-xl hover:scale-105 active:scale-95 cursor-pointer select-none"
+                          className="px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-full text-white font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 flex items-center gap-2 shadow-xl hover:scale-105 active:scale-95 cursor-pointer select-none"
                           style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.18)',
                             backdropFilter: 'blur(12px)',
@@ -237,23 +237,23 @@ export default function Home() {
                           }}
                         >
                           <span>{slide.cta}</span>
-                          <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                          <span className="material-symbols-outlined text-base sm:text-lg">arrow_forward</span>
                         </button>
                       </Link>
                     </div>
 
                     {/* Trust Badges Row (Glassmorphism) */}
-                    <div className="flex flex-wrap items-center gap-3 mt-4">
-                      <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase text-white bg-[rgba(255,255,255,0.15)] backdrop-blur-[10px] border border-[rgba(255,255,255,0.25)] shadow-[0_4px_12px_rgba(0,0,0,0.1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
-                        <span className="material-symbols-outlined text-[14px]">ac_unit</span>
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 mt-3 sm:mt-4">
+                      <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[9px] sm:text-[11px] font-bold tracking-wide uppercase text-white bg-[rgba(255,255,255,0.15)] backdrop-blur-[10px] border border-[rgba(255,255,255,0.25)] shadow-[0_4px_12px_rgba(0,0,0,0.1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
+                        <span className="material-symbols-outlined text-[12px] sm:text-[14px]">ac_unit</span>
                         Flash Frozen at -18°C
                       </div>
-                      <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase text-white bg-[rgba(255,255,255,0.15)] backdrop-blur-[10px] border border-[rgba(255,255,255,0.25)] shadow-[0_4px_12px_rgba(0,0,0,0.1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
-                        <span className="material-symbols-outlined text-[14px]">local_shipping</span>
+                      <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[9px] sm:text-[11px] font-bold tracking-wide uppercase text-white bg-[rgba(255,255,255,0.15)] backdrop-blur-[10px] border border-[rgba(255,255,255,0.25)] shadow-[0_4px_12px_rgba(0,0,0,0.1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
+                        <span className="material-symbols-outlined text-[12px] sm:text-[14px]">local_shipping</span>
                         Delivery within 8km
                       </div>
-                      <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase text-white bg-[rgba(255,255,255,0.15)] backdrop-blur-[10px] border border-[rgba(255,255,255,0.25)] shadow-[0_4px_12px_rgba(0,0,0,0.1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
-                        <span className="material-symbols-outlined text-[14px]">price_change</span>
+                      <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[9px] sm:text-[11px] font-bold tracking-wide uppercase text-white bg-[rgba(255,255,255,0.15)] backdrop-blur-[10px] border border-[rgba(255,255,255,0.25)] shadow-[0_4px_12px_rgba(0,0,0,0.1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
+                        <span className="material-symbols-outlined text-[12px] sm:text-[14px]">price_change</span>
                         Market Price Applies
                       </div>
                     </div>

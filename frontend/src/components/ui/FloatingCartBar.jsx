@@ -34,10 +34,10 @@ const FloatingCartBar = ({ hidden }) => {
       animate={bump ? { x: 0, opacity: 1, scale: [1, 1.08, 1], y: [0, -6, 0] } : { x: 0, opacity: 1, scale: 1, y: 0 }}
       exit={{ x: 150, opacity: 0, scale: 0.9 }}
       transition={bump ? { duration: 0.3, ease: 'easeInOut' } : { type: 'spring', stiffness: 280, damping: 22 }}
-      className="fixed bottom-0 left-0 right-0 sm:bottom-5 sm:right-8 sm:left-auto z-[999] w-full sm:w-auto sm:min-w-[290px] max-w-full sm:max-w-sm bg-primary sm:bg-[#0f172a]/95 backdrop-blur-md text-white px-4 py-3 sm:py-2.5 rounded-t-2xl sm:rounded-[14px] shadow-2xl sm:shadow-[0_12px_45px_rgba(0,0,0,0.35)] cursor-pointer border-t sm:border border-white/10 hover:bg-[#131d33] transition-all"
+      className="fixed bottom-[74px] left-3 right-3 sm:bottom-5 sm:right-8 sm:left-auto z-[55] sm:z-[999] w-auto sm:min-w-[290px] max-w-full sm:max-w-sm bg-primary sm:bg-[#0f172a]/95 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl sm:rounded-[14px] shadow-2xl sm:shadow-[0_12px_45px_rgba(0,0,0,0.35)] cursor-pointer border border-white/10 hover:bg-[#131d33] transition-all"
       onClick={() => navigate('/cart')}
     >
-      <div className="flex items-center justify-between w-full pb-safe">
+      <div className="flex items-center justify-between w-full">
         {/* Left side: Cart icon + items count + separator + total */}
         <div className="flex items-center gap-2.5">
           <div className="bg-white/10 text-white p-1.5 rounded-md flex items-center justify-center">

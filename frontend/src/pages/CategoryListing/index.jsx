@@ -736,22 +736,6 @@ export default function CategoryListing() {
         </div>
       </div>
 
-      {/* Floating Filters Button - Mobile Only */}
-      <button
-        type="button"
-        onClick={() => setFiltersOpen(true)}
-        className="lg:hidden fixed bottom-20 left-4 z-40 bg-white text-primary border border-outline-variant shadow-lg rounded-full px-4 py-2.5 flex items-center gap-2 text-xs font-bold hover:bg-surface-container transition-colors active:scale-95 duration-100 min-h-[44px]"
-        aria-label="Open filter preferences"
-      >
-        <span className="material-symbols-outlined text-[16px]">tune</span>
-        <span>Filters</span>
-        {activeCount > 0 && (
-          <span className="bg-primary text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold">
-            {activeCount}
-          </span>
-        )}
-      </button>
-
       {/* Mobile filter drawer */}
       <Drawer
         isOpen={filtersOpen}
