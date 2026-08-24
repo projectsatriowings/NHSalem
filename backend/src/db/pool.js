@@ -5,17 +5,24 @@ dotenv.config()
 
 const { Pool } = pg
 
-let connectionString = process.env.DATABASE_URL
+/**
+ * Normalizes connection string to use sslmode=verify-full.
+ * Eliminates: "(node) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'."
+ */
+export function getCleanConnectionString(url = process.env.DATABASE_URL) {
+  if (!url) return url
+  let clean = url.replace(/sslmode=(require|prefer|verify-ca)/gi, 'sslmode=verify-full')
+  if (!clean.includes('sslmode=')) {
+    const separator = clean.includes('?') ? '&' : '?'
+    clean = `${clean}${separator}sslmode=verify-full`
+  }
+  return clean
+}
+
+let connectionString = getCleanConnectionString(process.env.DATABASE_URL)
 
 if (!connectionString) {
   console.warn('⚠️  WARNING: DATABASE_URL is not set in environment!')
-}
-
-// Neon requires sslmode=verify-full to avoid the SSL alias security warning.
-// If the URL doesn't already specify sslmode, append it.
-if (connectionString && !connectionString.includes('sslmode=')) {
-  const separator = connectionString.includes('?') ? '&' : '?'
-  connectionString = `${connectionString}${separator}sslmode=verify-full`
 }
 
 export const pool = new Pool({
@@ -33,3 +40,4 @@ pool.on('error', (err) => {
 })
 
 export default pool
+

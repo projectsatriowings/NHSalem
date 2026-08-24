@@ -9,14 +9,18 @@ dotenv.config()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+import { getCleanConnectionString } from './pool.js'
+
 const { Client } = pg
 
 async function runMigration() {
-  const connectionString = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL
-  if (!connectionString) {
+  const rawConnectionString = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL
+  if (!rawConnectionString) {
     console.error('DATABASE_URL_UNPOOLED or DATABASE_URL must be set')
     process.exit(1)
   }
+
+  const connectionString = getCleanConnectionString(rawConnectionString)
 
   console.log('Connecting to Neon database for migration...')
   const client = new Client({

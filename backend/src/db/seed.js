@@ -12,14 +12,18 @@ import { ADMIN_REVIEWS, ADMIN_WHOLESALE, ADMIN_ORDERS, ADMIN_CUSTOMERS, ADMIN_PR
 
 dotenv.config()
 
+import { getCleanConnectionString } from './pool.js'
+
 const { Client } = pg
 
 async function runSeed() {
-  const connectionString = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL
-  if (!connectionString) {
+  const rawConnectionString = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL
+  if (!rawConnectionString) {
     console.error('DATABASE_URL or DATABASE_URL_UNPOOLED must be set')
     process.exit(1)
   }
+
+  const connectionString = getCleanConnectionString(rawConnectionString)
 
   console.log('Connecting to database for seeding...')
   const client = new Client({
