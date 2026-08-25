@@ -156,6 +156,14 @@ html, body {
   }
 }
 
+@media (min-width: 2400px) {
+  .container-max {
+    padding-left: 4rem;   /* 64px on ultrawide / 4K monitors */
+    padding-right: 4rem;
+    max-width: 2040px;
+  }
+}
+
 /* Skeleton shimmer animation */
 .skeleton-shimmer {
   background: linear-gradient(90deg, #efedf0 25%, #e4e2e5 50%, #efedf0 75%);
